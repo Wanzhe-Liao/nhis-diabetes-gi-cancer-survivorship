@@ -1,0 +1,11 @@
+# NHIS diabetes and digestive cancer survivorship
+
+Analysis code for all 22 NHIS survey years, 1997-2018, linked to the 2019 public-use mortality files. The primary analysis includes 4,910 GI cancer survivors and 2,001 deaths; the full survey-design population contains 646,201 linkage-eligible Sample Adults.
+
+Requires Python 3.14 and R 4.6.1. Install Python dependencies with `pip install -r requirements.txt` and R packages with `scripts/setup_r_4_6_1.R`. Set `NHIS_RAW_ROOT` and `LMF_RAW_ROOT` to local data directories; run scripts from the project root.
+
+`scripts/` contains data preparation, survey-domain Cox models, bootstrap standardization, sensitivity analyses, and plotting code. The survey design uses the full linkage-eligible Sample Adult population before subsetting to GI survivors. Strata and nested PSU identifiers are shared within the 1997-2005, 2006-2015 and 2016-2018 design periods and separated across periods (691 strata; 1,937 PSUs). Cox inference uses Taylor linearization. Absolute-risk, spline and standardized-curve intervals use 500 Rao-Wu n_h-1 PSU resamples, applying multiplicity times n_h/(n_h-1) to each original record as replicate weights, including zero-domain PSUs in the sampling frame. Released NCHS weight adjustments are held fixed.
+
+Primary inputs retain the `v4inc2007` filenames, and primary R results are written to `outputs/revision_round1_v4_r461_sens2007/`. The directory name is retained for compatibility. `REV1_COHORT_PATH`, `REV1_FULLSAMPLE_PATH`, `REV1_OUTPUT_DIR`, and `REV1_SUPPORT_DIR` can override these defaults. The analysis excluding 2007 is a secondary year-coverage sensitivity analysis.
+
+The principal established pre-cancer diabetes estimate is HR 1.6868 (95% CI 1.4355-1.9822); the standardized 10-year risk difference is 14.84 per 100 survivors (95% CI 10.17-19.14). `scripts/rev1_p1_main.R` writes both the primary models and `year_coverage_sensitivity.csv`; run the risk bootstrap, spline and PH scripts after it. `tests/test_rev1_survey_variance.R` checks the period design, replicate sampler against `survey::subbootweights`, and fitted covariance against independent PSU influence aggregation. Run R scripts from the project root through `scripts/run_r_4_6_1.ps1`.
